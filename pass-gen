@@ -1,9 +1,41 @@
 #!/bin/bash
-WORDLIST=~/src/scripts/pass-gen/EFF_wordlist
+WORDLIST=./wordlists/EFF_wordlist
+CHARLIST=~/src/scripts/pass-gen/ASCII_symbol_list
+PADDING_BEFORE=2
+PADDING_AFTER=2
+PADDING_LENGTH=4
+
+NUMBER_OF_WORDS=6
 COUNTER=1
+
+  if [[ "$1" ]]; then     # If there is at least one parameter, process them 
+    while [[ "$1" ]]; do
+      currentParamater=$1
+      case "$1" in 
+        -l | --length)   shift
+                         NUMBER_OF_WORDS=$1
+        ;;
+        --word-list)     shift
+                         WORDLIST=$1
+        ;;
+        --special-character-list)     shift
+                         CHARLIST=$1
+        ;;
+      esac
+      shift
+    done
+  fi
+
+#  Pick a random symbol from CHARLIST
+MIN=1
+MAX=$(cat $CHARLIST | wc -l)
+
+RANDOM_NUM="$(( $MIN + $(od -An -N2 -i /dev/urandom) % ($MAX - $MIN + 1) ))"
+
+RANDOM_CHAR="$(sed -n ${RANDOM_NUM}p $CHARLIST)"
+
 #  Generate a random number between MAX and MIN
-for i in {1..5}
-do
+for i in $(seq 1 $NUMBER_OF_WORDS); do
   MIN=1
   MAX=$(cat $WORDLIST | wc -l)
 
@@ -19,7 +51,16 @@ do
   COUNTER=$(( $COUNTER + 1 ))
   echo "Your random word is $RANDOM_WORD"
 
-  RANDOM_PASS="${RANDOM_PASS}${RANDOM_WORD}!"
+  RANDOM_PASS="${RANDOM_PASS}${RANDOM_WORD}${RANDOM_CHAR}"
 done
+
+#  Add padding
+
+for i in $(seq 1 $PADDING_LENGTH); do
+  RANDOM_NUM="$(( 0 + $(od -An -N2 -i /dev/urandom) % (9 - 0 + 1) ))"
+  PADDING=${PADDING}${RANDOM_NUM}
+done
+
+RANDOM_PASS=${RANDOM_PASS}${PADDING}
 
 echo "$RANDOM_PASS"
