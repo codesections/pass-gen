@@ -1,0 +1,25 @@
+#!/bin/bash
+WORDLIST=~/src/scripts/pass-gen/EFF_wordlist
+COUNTER=1
+#  Generate a random number between MAX and MIN
+for i in {1..5}
+do
+  MIN=1
+  MAX=$(cat $WORDLIST | wc -l)
+
+  RANDOM_NUM="$(( $MIN + $(od -An -N2 -i /dev/urandom) % ($MAX - $MIN + 1) ))"
+
+  echo "Your random number is $RANDOM_NUM"
+
+  RANDOM_WORD="$(sed -n ${RANDOM_NUM}p $WORDLIST)"
+  CAPITALIZE=$[ $COUNTER % 2 ]
+  if [ $CAPITALIZE -eq "0" ]; then
+    RANDOM_WORD="$(echo $RANDOM_WORD | tr '[:lower:]' '[:upper:]')"
+  fi
+  COUNTER=$(( $COUNTER + 1 ))
+  echo "Your random word is $RANDOM_WORD"
+
+  RANDOM_PASS="${RANDOM_PASS}${RANDOM_WORD}!"
+done
+
+echo "$RANDOM_PASS"
