@@ -1,66 +1,138 @@
 #!/bin/bash
-WORDLIST=./wordlists/EFF_wordlist
+
+#  Default settings (unless overridden by command-line options or .passgenrc)
+WORDLIST=./wordlists/EFF_wordlist_total
 CHARLIST=~/src/scripts/pass-gen/ASCII_symbol_list
-PADDING_BEFORE=2
-PADDING_AFTER=2
-PADDING_LENGTH=4
-
+PADDING_LENGTH_BEFORE=0
+PADDING_LENGTH_AFTER=3
 NUMBER_OF_WORDS=6
-COUNTER=1
+CAPITAL_COUNTER="$(( $(od -An -N2 -i /dev/urandom) % (2) ))" #randomly 1 or 2
+DISPLAY_PASSWORD=false
+#  CONFIG_FILE=~/.passgenrc
 
-  if [[ "$1" ]]; then     # If there is at least one parameter, process them 
-    while [[ "$1" ]]; do
-      currentParamater=$1
-      case "$1" in 
-        -l | --length)   shift
-                         NUMBER_OF_WORDS=$1
-        ;;
-        --word-list)     shift
-                         WORDLIST=$1
-        ;;
-        --special-character-list)     shift
-                         CHARLIST=$1
-        ;;
-      esac
-      shift
-    done
-  fi
+cmd_version() {
+  cat <<-_EOF
+pass-gen v.0.0.1
+Copyright (C) 2018 Daniel Long Sockwell, www.codesections.com
+License GPLv3+: GNU GPL version 3, https://gnu.org/licenses/gpl.html.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by Daniel Long Sockwell
+	_EOF
+  exit 0
+}
+
+
+cmd_help() {
+  cat <<-_EOF
+Usage: pass-gen [OPTION]
+
+Generates a secure, random passphrase based on the options supplied.
+By default, the passphrase is copied to the xclip clipboard,  not displayed
+
+Options:
+  -l <NUMBER>, --length <NUMBER>   use NUMBER words to generate the passphrase
+  --padding-before <NUMBER>        preceed passphrase with NUMBER random numbers
+  --padding-after <NUMBER>         follow passphrase with NUMBER random numbers
+  -e, --echo-password              display the passphrase in the terminal
+  --word-list <PATH>               use wordlist found at PATH
+  --special-character-list <PATH>  use special character list found at PATH
+  -v, -V, --version                display version information and exit
+  -h, --help                       display this help message and exit
+
+Full documentation avalible in the pass-gen(1) man page.
+	_EOF
+  exit 0
+}
+
+cmd_error() {
+  cat <<-_EOF
+pass-gen: unrecognized option '$1'
+Try 'pass-gen --help' for more information.
+	_EOF
+  exit 1
+}
+
+#  Process command-line options and update settings as required
+if [[ "$1" ]]; then     
+  while [[ "$1" ]]; do
+    currentParamater=$1
+    case "$1" in 
+      -l | --length) shift;                     NUMBER_OF_WORDS=$1 ;;
+      --word-list) shift;                       WORDLIST=$1 ;;
+      --special-character-list) shift;          CHARLIST=$1 ;;
+      --padding-before) shift;                  PADDING_LENGTH_BEFORE=$1 ;;
+      --padding-after) shift;                   PADDING_LENGTH_AFTER=$1 ;;
+      -e | --echo-password) shift;              DISPLAY_PASSWORD=true ;;
+      -v | -V | --version) shift;               cmd_version ;;
+      -h | --help) shift;                       cmd_help ;;
+      # --config-file) shift;                    CONFIG_FILE=$1 ;;
+      *)                                  cmd_error "$@" ;;
+    esac
+    shift
+  done
+fi
+
 
 #  Pick a random symbol from CHARLIST
-MIN=1
-MAX=$(cat $CHARLIST | wc -l)
+generate_random_symbol() {
+  MIN=1
+  MAX=$(cat $CHARLIST | wc -l)
+  #  Generate a random number between MAX and MIN
+  RANDOM_NUM="$(( $MIN + $(od -An -N2 -i /dev/urandom) % ($MAX - $MIN + 1) ))"
+  RANDOM_CHAR="$(sed -n ${RANDOM_NUM}p $CHARLIST)"
+}
 
-RANDOM_NUM="$(( $MIN + $(od -An -N2 -i /dev/urandom) % ($MAX - $MIN + 1) ))"
 
-RANDOM_CHAR="$(sed -n ${RANDOM_NUM}p $CHARLIST)"
-
-#  Generate a random number between MAX and MIN
-for i in $(seq 1 $NUMBER_OF_WORDS); do
+#  Generate a random word from WORDLIST
+generate_random_word() {
   MIN=1
   MAX=$(cat $WORDLIST | wc -l)
-
+  #  Generate a random number between MAX and MIN
   RANDOM_NUM="$(( $MIN + $(od -An -N2 -i /dev/urandom) % ($MAX - $MIN + 1) ))"
 
-  echo "Your random number is $RANDOM_NUM"
-
   RANDOM_WORD="$(sed -n ${RANDOM_NUM}p $WORDLIST)"
-  CAPITALIZE=$[ $COUNTER % 2 ]
-  if [ $CAPITALIZE -eq "0" ]; then
+}
+
+
+#  Capitalize the word if necessary
+capitalize_alternate_words() {
+  if [ $(( $CAPITAL_COUNTER % 2 )) -eq "0" ]; then
     RANDOM_WORD="$(echo $RANDOM_WORD | tr '[:lower:]' '[:upper:]')"
   fi
-  COUNTER=$(( $COUNTER + 1 ))
-  echo "Your random word is $RANDOM_WORD"
+  CAPITAL_COUNTER=$(( $CAPITAL_COUNTER + 1 ))
+}
 
-  RANDOM_PASS="${RANDOM_PASS}${RANDOM_WORD}${RANDOM_CHAR}"
-done
 
 #  Add padding
+generate_padding() {
+  for i in $(seq 1 $PADDING_LENGTH_AFTER); do
+    RANDOM_NUM="$(( 0 + $(od -An -N2 -i /dev/urandom) % (9 - 0 + 1) ))"
+    PADDING_AFTER=${PADDING_AFTER}${RANDOM_NUM}
+  done
+  for i in $(seq 1 $PADDING_LENGTH_BEFORE); do
+    RANDOM_NUM="$(( 0 + $(od -An -N2 -i /dev/urandom) % (9 - 0 + 1) ))"
+    PADDING_BEFORE=${PADDING_BEFORE}${RANDOM_NUM}
+  done
+}
 
-for i in $(seq 1 $PADDING_LENGTH); do
-  RANDOM_NUM="$(( 0 + $(od -An -N2 -i /dev/urandom) % (9 - 0 + 1) ))"
-  PADDING=${PADDING}${RANDOM_NUM}
+#  Generate passphrase by combining random words with the chosen character
+generate_random_symbol
+for i in $(seq 1 $NUMBER_OF_WORDS); do
+  generate_random_word
+  capitalize_alternate_words
+  RANDOM_PASS="${RANDOM_PASS}${RANDOM_WORD}${RANDOM_CHAR}"
 done
+generate_padding
+RANDOM_PASS=${PADDING_BEFORE}${RANDOM_PASS}${PADDING_AFTER}
 
-RANDOM_PASS=${RANDOM_PASS}${PADDING}
 
-echo "$RANDOM_PASS"
+echo -n "$RANDOM_PASS" | xclip -selection "clipboard"
+echo "Generated passphrase copied to clipboard.  Will clear in 45 seconds."
+
+( sleep 45 ; echo -n "" | xclip -selection "clipboard" ) &
+
+if [ "$DISPLAY_PASSWORD" = true ]; then
+  echo $RANDOM_PASS
+fi
