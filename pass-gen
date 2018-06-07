@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #  Default settings (unless overridden by command-line options or .passgenrc)
-WORDLIST=./wordlists/EFF_wordlist_total
-CHARLIST=~/src/scripts/pass-gen/ASCII_symbol_list
+WORDLIST=/usr/lib/pass-gen/wordlists/EFF_wordlist_total
+CHARLIST=/usr/lib/pass-gen/character-lists/conservative_character_list
 PADDING_LENGTH_BEFORE=0
 PADDING_LENGTH_AFTER=3
 NUMBER_OF_WORDS=6
@@ -47,11 +47,11 @@ Full documentation avalible in the pass-gen(1) man page.
 }
 
 cmd_error() {
-  cat <<-_EOF
-pass-gen: unrecognized option '$1'
-Try 'pass-gen --help' for more information.
+    cat <<-_EOF
+  pass-gen: unrecognized option '$1'
+  Try 'pass-gen --help' for more information.
 	_EOF
-  exit 1
+    exit 1
 }
 
 #  Process command-line options and update settings as required
@@ -59,18 +59,17 @@ if [[ "$1" ]]; then
   while [[ "$1" ]]; do
     currentParamater=$1
     case "$1" in 
-      -l | --length) shift;                     NUMBER_OF_WORDS=$1 ;;
-      --word-list) shift;                       WORDLIST=$1 ;;
-      --special-character-list) shift;          CHARLIST=$1 ;;
-      --padding-before) shift;                  PADDING_LENGTH_BEFORE=$1 ;;
-      --padding-after) shift;                   PADDING_LENGTH_AFTER=$1 ;;
-      -e | --echo-password) shift;              DISPLAY_PASSWORD=true ;;
-      -v | -V | --version) shift;               cmd_version ;;
-      -h | --help) shift;                       cmd_help ;;
-      # --config-file) shift;                    CONFIG_FILE=$1 ;;
-      *)                                  cmd_error "$@" ;;
+      -l | --length) shift;                  NUMBER_OF_WORDS=$1; shift ;;
+      --word-list) shift;                    WORDLIST=$1; shift ;;
+      --special-character-list) shift;       CHARLIST=$1; shift ;;
+      --padding-before) shift;               PADDING_LENGTH_BEFORE=$1; shift ;;
+      --padding-after) shift;                PADDING_LENGTH_AFTER=$1; shift ;;
+      -e | --echo-password) shift;           DISPLAY_PASSWORD=true ;;
+      -v | -V | --version) shift;            cmd_version ;;
+      -h | --help) shift;                    cmd_help ;;
+#     --config-file) shift;                  CONFIG_FILE=$1 ;;
+      *)                                     cmd_error "$@" ;;
     esac
-    shift
   done
 fi
 
@@ -105,7 +104,7 @@ capitalize_alternate_words() {
 }
 
 
-#  Add padding
+#  Generate random numbers to pad the passphrase
 generate_padding() {
   for i in $(seq 1 $PADDING_LENGTH_AFTER); do
     RANDOM_NUM="$(( 0 + $(od -An -N2 -i /dev/urandom) % (9 - 0 + 1) ))"
@@ -129,7 +128,7 @@ RANDOM_PASS=${PADDING_BEFORE}${RANDOM_PASS}${PADDING_AFTER}
 
 
 echo -n "$RANDOM_PASS" | xclip -selection "clipboard"
-echo "Generated passphrase copied to clipboard.  Will clear in 45 seconds."
+>&2 echo "Generated passphrase copied to clipboard.  Will clear in 45 seconds."
 
 ( sleep 45 ; echo -n "" | xclip -selection "clipboard" ) &
 
