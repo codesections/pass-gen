@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #  Default settings (unless overridden by command-line options or .passgenrc)
-WORDLIST=/usr/lib/pass-gen/wordlists/EFF_wordlist_total
-CHARLIST=/usr/lib/pass-gen/character-lists/conservative_character_list
+WORDLIST=/usr/local/lib/pass-gen/wordlists/EFF_wordlist_total
+CHARLIST=/usr/local/lib/pass-gen/character-lists/conservative_character_list
 PADDING_LENGTH_BEFORE=0
 PADDING_LENGTH_AFTER=3
 NUMBER_OF_WORDS=6
