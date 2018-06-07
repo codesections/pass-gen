@@ -28,6 +28,10 @@ By default, \fBpass-gen\fP uses 0 numbers before the words, 6 words, and 3 numbe
 With default settings, the following password could be generated:
   DOORKNOB^postbox^OUTSHOOT^clever^STATUS^backfield^796
 
+.SH CONFIGURATION
+
+\fBpass-gen\fP uses sane defaults and may be securely used without any configuration.  However, \fBpass-gen\fP is also highly configurable.  Configuration options can be specified at the command line (see \fBoptions\fP, below) or, at your option, may be specified in a ~/.passgenrc file using the same syntax as at the command line, except that each command must be followed by an equals sign.  If you specify an option in a .passgenrc file and at the command line, the option specified at the command line will take effect. 
+
 .SH OPTIONS
 
 .TP
@@ -76,7 +80,7 @@ Generated passphrase copied to clipboard.  Will clear in 45 seconds.
 34OUTBREAK^caucus^PROBLEM^attempt^CARLESS^outsell^CORRECT^8
 
 .TP
-Usage with \fBpass\fP, the standard Unix password manager
+Usage with \fBpass\fP, the standard Unix password manager:
 .B $ pass-gen -e | pass add -e USERNAME
 .br
 Generated passphrase copied to clipboard.  Will clear in 45 seconds.
@@ -86,6 +90,18 @@ Generated passphrase copied to clipboard.  Will clear in 45 seconds.
  1 file changed, 0 insertions(+), 0 deletions(-)
 .br
  create mode 100644 USERNAME.gpg
+
+.TP
+Example ~/.passgenrc configuration file:
+word-list=~/pass-gen/wordlists/Beale_wordlist
+.br
+echo-password
+.br
+padding-after=1
+.br
+padding-before=1
+.br
+character-list=~/pass-gen/character-lists/ASCII_symbol_list
 
 .SH WORDLISTS & CHARACTER LISTS
 .TP
@@ -126,6 +142,10 @@ The original Diceware wordlist for use generating a password by rolling dice.  G
 .UR http://world.std.com/~reinhold/diceware.html
 .UE 
 for details.
+
+.TP
+\fBBeale_wordlist\fP                                                7,528 words
+Alternate Diceware wordlist with fewer Americanisms.
 
 .TP
 \fB1Password_wordlist\fP                                           18,325 words

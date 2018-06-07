@@ -54,6 +54,40 @@ cmd_error() {
     exit 1
 }
 
+
+#  If a configuration file exists, read values from it
+if [ -f /home/$USER/.passgenrc ]; then
+  echo "Reading preset values from ~/.passgenrc"
+  CONFIG_FILE="/home/$USER/.passgenrc"
+  ## Find the `current_project` key, and get the quoted string value 
+  if [ $(grep word-list $CONFIG_FILE) ]; then
+    WORDLIST=$(grep word-list $CONFIG_FILE | cut --delimiter== --fields=2)
+    WORDLIST=$(echo $WORDLIST | sed -e "s_~_/home/${USER}_")
+  fi
+  
+  if [ $(grep character-list $CONFIG_FILE) ]; then
+    CHARLIST=$(grep character-list $CONFIG_FILE | cut --delimiter== --fields=2)
+    CHARLIST=$(echo $CHARLIST | sed -e "s_~_/home/${USER}_")
+  fi
+
+  if [ $(grep padding-before $CONFIG_FILE) ]; then
+    PADDING_LENGTH_BEFORE=$(grep padding-before $CONFIG_FILE | cut --delimiter== --fields=2)
+  fi
+  
+  if [ $(grep padding-after $CONFIG_FILE) ]; then
+    PADDING_LENGTH_AFTER=$(grep padding-after $CONFIG_FILE | cut --delimiter== --fields=2)
+  fi
+
+  if [ $(grep length $CONFIG_FILE) ]; then
+    NUMBER_OF_WORDS=$(grep length $CONFIG_FILE | cut --delimiter== --fields=2)
+  fi
+
+  if [ $(grep echo-password $CONFIG_FILE) ]; then
+    DISPLAY_PASSWORD=true
+  fi
+fi
+
+
 #  Process command-line options and update settings as required
 if [[ "$1" ]]; then     
   while [[ "$1" ]]; do
@@ -67,7 +101,6 @@ if [[ "$1" ]]; then
       -e | --echo-password) shift;           DISPLAY_PASSWORD=true ;;
       -v | -V | --version) shift;            cmd_version ;;
       -h | --help) shift;                    cmd_help ;;
-#     --config-file) shift;                  CONFIG_FILE=$1 ;;
       *)                                     cmd_error "$@" ;;
     esac
   done
