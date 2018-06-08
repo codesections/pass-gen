@@ -1,12 +1,12 @@
 # pass-gen
 
-**pass-gen** generates secure, pronounceable passphrases that can be used on their own, copied to a GUI password manager, or piped directly into a password manager that accepts standard input.
+`pass-gen` generates secure, pronounceable passphrases that can be used on their own, copied to a GUI password manager, or piped directly into a password manager that accepts standard input.
 
 Password security is important.  But imagine you need to log into your email account from a computer at the library.  Which password would you rather type in: `{!]&Sk)r"ss|$K40:]PP''3k-` or `skirt?UNSTEADY?legend?SUPERJET?livable?DINGBAT?507`?  What if I told you that the second one is just as secure as the first?
 
 Anytime you might need to type in a password, or read a password out to someone else, or use a password on a device that doesn't have your password manager installed—that is, anytime at all—you would be better off using a securely generated passphrase.
 
-Of course, that doesn't mean **not** to use a password manager for those times that you _don't_ need to type your password in.  So, ideally you'd want a password generator that plays well with your password manager.  In the Unix tradition, the best way for one tool to play well with another is to produce plain-text standard output.
+Of course, that doesn't mean that you **shouldn't** use a password manager for those times when you _don't_ need to type your password in.  So, ideally you'd want a password generator that plays well with your password manager.  In the Unix tradition, the best way for one tool to play well with another is to produce plain-text standard output.
 
 pass-gen does exactly that.  Use it to generate secure, pronounceable passphrases and then pipe them on to any other tool that accepts standard input. 
 
@@ -14,7 +14,7 @@ pass-gen is:
 
 * **Secure** — pass-gen uses lengthy wordlists, secure random number generation, and sane defaults to ensure that all generated passphrases are cryptographically impregnable.  With default settings, the average entropy of a pass-gen generated passphrase is 532 bits.  Even if an attacker had full knowledge of the wordlist and generation algorithm, the default settings produce a minimum entropy of 93 bits.
 * **Customizable** — The best way to avoid attackers knowing how you generated a password is to generate it in a different way than anyone else.  Although pass-gen is fully secure without any configuration, you can fully customize the password-generation process, either through command-line options or via a configuration file.  This customization includes the ability to use any of the dozens of built-in wordlists, or to create your own custom wordlist.
-* **Dependency-free** — Password generation should be lightweight and portable because you never know when you may need to create a new password.  To that end, pass-gen does not require installing Python, Perl, NodeJs, Rust, or any other runtime.  Nor does it require compilation or depend on unusual tools.  If you can run a Bash script (hint: if you are on Linux, Mac, or Windows 10, you can run Bash), you can run pass-gen. 
+* **Dependency-free** — Password generation should be lightweight and portable; you never know when you might need a new password.  To that end, pass-gen does not require installing Python, Perl, NodeJs, Rust, or any other runtime.  Nor does it require compilation or depend on unusual tools.  If you can run a Bash script (hint: if you are on Linux, Mac, or Windows 10, you can run Bash), you can run pass-gen. 
 
 ## Installation 
 To install pass-gen, run the following command in your terminal:
