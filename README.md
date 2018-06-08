@@ -34,7 +34,7 @@ sudo ./unistall.sh
 ```
 
 ## Usage
-See the manual page for full details (after installing pass-gen, run `man pass-gen`) or run pass-gen --help for shorter information. 
+See the manual page for full details (after installing pass-gen, run `man pass-gen`) or run `pass-gen --help` for shorter information. 
 
 **basic usage**:
 
