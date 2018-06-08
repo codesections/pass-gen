@@ -1,5 +1,10 @@
 #!/bin/bash
 
+#  Copyright 2018 Daniel Long Sockwell <daniel@codesections.com>.  
+#  All rights reserved.  This file is licensed under the GPLv3+.
+#  Please see COPYING for more information.
+
+
 #  Default settings (unless overridden by command-line options or .passgenrc)
 WORDLIST=/usr/local/lib/pass-gen/wordlists/EFF_wordlist_total
 CHARLIST=/usr/local/lib/pass-gen/character-lists/conservative_character_list
