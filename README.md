@@ -20,7 +20,7 @@ pass-gen is:
 To install pass-gen, run the following command in your terminal:
 
 ```
-git clone git@gitlab.com:codesections/pass-gen.git &&\
+git clone git@gitlab.com/codesections/pass-gen.git &&\
 cd pass-gen && \
 sudo ./install.sh
 ```
