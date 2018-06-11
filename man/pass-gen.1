@@ -44,6 +44,9 @@ Insert \fInumber\fP numbers before the words that comprise the passphrase.  Defa
 \fB--padding-after\fP \fInumber\fP
 Insert \fInumber\fP numbers after the words that comprise the passphrase.  Default value: 3.
 .TP
+\fB--capital-mode\fIall|initial|both
+Set the capitalization mode.  If set to `all`, every other word will be in all capitals (LIKE THIS).  If set to `initial`, every other word will have its first letter capitalized (Like This).  If set to `both`, every third word will be all capitals, and every third word will have an initial capital.  For example, a three-word password without padding might be `bazooka@Backyard@PREVIOUS@`.  Under any setting, the capitalization status of the first word will be chosen randomly, and the capitalization status of the other words will alternate.  Default value: both.
+.TP
 \fB-e | --echo-password\fP
 Echos the generated password to standard output (thus typically displaying it to the command line) in addition to copying it to the clipboard.  By default, the password is not displayed, just copied, which prevents it from being inadvertently seen by others.
 .TP
@@ -51,7 +54,7 @@ Echos the generated password to standard output (thus typically displaying it to
 Uses a wordlist file found at \fIpath/to/wordlist/file\fP.  A wordlist is a simple file of words, one per line.  The passphrase will be constructed by randomly selecting words from the wordlist file.  Multiple wordlist files are included in pass-gen/wordlists; see the \fBwordlists & character lists\fP section, below, for details about the size and providence of the built-in wordlists.  Alternately, you may use your own wordlist, so long as it consists of one word per line.  Default value: pass-gen/wordlist/EEF_wordlist_total.
 .TP
 \fB--special-character-list \fIpath/to/special-character/file\fP
-Uses a character list file found at \fIpath/to/character-list/file\fP.  A character list is a simple file of characters, one per line.  When constructing a passphrase, \fBpass-gen\fP will append a random character after each word to separate the words and render them compound safe.  (The same character is used throughout the passphrase.)  Multiple character list files are included in pass-gen/character-lists; see the \fBwordlists & character lists\fP section, below, for details about the size and providence of the built-in lists.  Alternately, you may use your own list, so long as it consists of one character per line.  Default value: pass-gen/character-lists/conservative_character_list
+Uses a character list file found at \fIpath/to/character-list/file\fP.  A character list is a simple file of characters, one per line.  When constructing a passphrase, \fBpass-gen\fP will append a random character after each word to separate the words and render them compound safe.  (The same character is used throughout the passphrase.)  Multiple character list files are included in pass-gen/character-lists; see the \fBwordlists & character lists\fP section, below, for details about the size and providence of the built-in lists.  Alternately, you may use your own list, so long as it consists of one character per line.  Default value: pass-gen/character-lists/default_character_list
 .TP
 \fB-v | -V | --version\fP
 Display version information and exit.
@@ -110,7 +113,7 @@ character-list=~/pass-gen/character-lists/ASCII_symbol_list
 .TP
 \fBEEF_wordlist_long\fP                                             7,776 words
 .br
-A wordlist prepared by the Electronic Freedom Foundation for use in generating passphrases by rolling five dice and picking a random word based on the roll.  The EFF selected words based on research from Ghent University's Center for Reading Research, and prioritized selecting words that are familiar to most English speakers, highly concrete, and not subject to common misspelling.  Currently used by KeePassXC to generate passphrases, with limited customization.  See
+A wordlist prepared by the Electronic Frontier Foundation for use in generating passphrases by rolling five dice and picking a random word based on the roll.  The EFF selected words based on research from Ghent University's Center for Reading Research, and prioritized selecting words that are familiar to most English speakers, highly concrete, and not subject to common misspelling.  Currently used by KeePassXC to generate passphrases, with limited customization.  See
 .UR https://www.eff.org/deeplinks/2016/07/new-wordlists-random-passphrases
 .UE  
 for more details.
@@ -118,7 +121,7 @@ for more details.
 .TP
 \fBEEF_wordlist_short\fP                                            1,296 words
 .br
-A wordlist prepared by the Electronic Freedom Foundation for use in generating passphrases by rolling four dice and picking a random word based on the roll.  The intention is for the short wordlist to contain fewer, shorter, and more memorable words and to be used to generate passphrases with longer words.  The EFF selected words based on research from Ghent University's Center for Reading Research, and prioritized selecting words that are familiar to most English speakers, highly concrete, and not subject to common misspelling.  See 
+A wordlist prepared by the Electronic Frontier Foundation for use in generating passphrases by rolling four dice and picking a random word based on the roll.  The intention is for the short wordlist to contain fewer, shorter, and more memorable words and to be used to generate passphrases with longer words.  The EFF selected words based on research from Ghent University's Center for Reading Research, and prioritized selecting words that are familiar to most English speakers, highly concrete, and not subject to common misspelling.  See 
 .UR https://www.eff.org/deeplinks/2016/07/new-wordlists-random-passphrases
 .UE  
 for more details.
@@ -126,7 +129,7 @@ for more details.
 .TP
 \fBEEF_wordlist_short_alt\fP                                        1,296 words
 .br
-An alternate wordlist prepared by the Electronic Freedom Foundation for use in generating passphrases by rolling four dice and picking a random word based on the roll.  Compared with the other short EEF wordlist, the goal of the alternate wordlist is to facilitate software-based autocompletion of passphrases.  The EFF selected words based on research from Ghent University's Center for Reading Research, and prioritized selecting words that are familiar to most English speakers, highly concrete, and not subject to common misspelling.  See 
+An alternate wordlist prepared by the Electronic Frontier Foundation for use in generating passphrases by rolling four dice and picking a random word based on the roll.  Compared with the other short EEF wordlist, the goal of the alternate wordlist is to facilitate software-based autocompletion of passphrases.  The EFF selected words based on research from Ghent University's Center for Reading Research, and prioritized selecting words that are familiar to most English speakers, highly concrete, and not subject to common misspelling.  See 
 .UR https://www.eff.org/deeplinks/2016/07/new-wordlists-random-passphrases
 .UE  
 for more details.
@@ -229,9 +232,13 @@ All ASCII printing characters that are non-alphanumeric: ! " # $ % ; ( ) * + ` -
 Characters approved for use in Oracle passwords: @ % + \ / ' ! # $ ^ ? : , ( ){ } ~ ` - _ .
 
 .TP
-\fBconservative_character_list
+\fBconservative_character_list\fP                                 18 characters
 Special characters selected to be acceptable in the vast majority of password fields: . ! @ $ % ^ & * - _ + = : | ~ ? /
 This character list is used by default.
+
+.TP
+\fBdefault_character_list\fP                                      54 characters
+All special characters from conservative_character_list, plus duplicates of those characters (e.g., both - and -- as separate entries on the list), plus numbers 0­9, plus double numbers 00-99. 
 
 
 .SH AUTHOR

@@ -7,11 +7,12 @@
 
 #  Default settings (unless overridden by command-line options or .passgenrc)
 WORDLIST=/usr/local/lib/pass-gen/wordlists/EFF_wordlist_total
-CHARLIST=/usr/local/lib/pass-gen/character-lists/conservative_character_list
+CHARLIST=/usr/local/lib/pass-gen/character-lists/default_character_list
 PADDING_LENGTH_BEFORE=0
 PADDING_LENGTH_AFTER=3
 NUMBER_OF_WORDS=6
 CAPITAL_COUNTER="$(( $(od -An -N2 -i /dev/urandom) % (2) ))" #randomly 1 or 2
+CAPITALIZATION_MODE="both"
 DISPLAY_PASSWORD=false
 #  CONFIG_FILE=~/.passgenrc
 
@@ -40,6 +41,7 @@ Options:
   -l <NUMBER>, --length <NUMBER>   use NUMBER words to generate the passphrase
   --padding-before <NUMBER>        preceed passphrase with NUMBER random numbers
   --padding-after <NUMBER>         follow passphrase with NUMBER random numbers
+  --capital-mode all|initial|both  set the capitalization mode for words
   -e, --echo-password              display the passphrase in the terminal
   --word-list <PATH>               use wordlist found at PATH
   --special-character-list <PATH>  use special character list found at PATH
@@ -75,6 +77,10 @@ if [ -f /home/$USER/.passgenrc ]; then
     CHARLIST=$(echo $CHARLIST | sed -e "s_~_/home/${USER}_")
   fi
 
+  if [ $(grep capital-mode $CONFIG_FILE) ]; then
+    PADDING_LENGTH_BEFORE=$(grep capital-mode $CONFIG_FILE | cut --delimiter== --fields=2)
+  fi
+
   if [ $(grep padding-before $CONFIG_FILE) ]; then
     PADDING_LENGTH_BEFORE=$(grep padding-before $CONFIG_FILE | cut --delimiter== --fields=2)
   fi
@@ -103,6 +109,7 @@ if [[ "$1" ]]; then
       --special-character-list) shift;       CHARLIST=$1; shift ;;
       --padding-before) shift;               PADDING_LENGTH_BEFORE=$1; shift ;;
       --padding-after) shift;                PADDING_LENGTH_AFTER=$1; shift ;;
+      --capital-mode) shift;                 CAPITALIZATION_MODE=$1; shift ;;
       -e | --echo-password) shift;           DISPLAY_PASSWORD=true ;;
       -v | -V | --version) shift;            cmd_version ;;
       -h | --help) shift;                    cmd_help ;;
@@ -134,9 +141,26 @@ generate_random_word() {
 
 
 #  Capitalize the word if necessary
-capitalize_alternate_words() {
-  if [ $(( $CAPITAL_COUNTER % 2 )) -eq "0" ]; then
+capitalize_all() {
+  if [ $(( ($CAPITAL_COUNTER - 1) % 2 )) -eq "0" ]; then
     RANDOM_WORD="$(echo $RANDOM_WORD | tr '[:lower:]' '[:upper:]')"
+  fi
+  CAPITAL_COUNTER=$(( $CAPITAL_COUNTER + 1 ))
+}
+
+capitalize_initial() {
+  if [ $(( $CAPITAL_COUNTER % 2 )) -eq "0" ]; then
+    RANDOM_WORD="$(echo $RANDOM_WORD | sed 's/./\U&/')"
+  fi
+  CAPITAL_COUNTER=$(( $CAPITAL_COUNTER + 1 ))
+}
+
+capitalize_both() {
+  if [ $(( ($CAPITAL_COUNTER - 1) % 3 )) -eq "0" ]; then
+    RANDOM_WORD="$(echo $RANDOM_WORD | tr '[:lower:]' '[:upper:]')"
+  fi
+  if [ $(( $CAPITAL_COUNTER % 3 )) -eq "0" ]; then
+    RANDOM_WORD="$(echo $RANDOM_WORD | sed 's/./\U&/')"
   fi
   CAPITAL_COUNTER=$(( $CAPITAL_COUNTER + 1 ))
 }
@@ -158,8 +182,19 @@ generate_padding() {
 generate_random_symbol
 for i in $(seq 1 $NUMBER_OF_WORDS); do
   generate_random_word
-  capitalize_alternate_words
+  if [ "$CAPITALIZATION_MODE" = "both" ]; then
+    capitalize_both
+  elif [ "$CAPITALIZATION_MODE" = "initial" ]; then
+    capitalize_initial
+  elif [ "$CAPITALIZATION_MODE" = "all" ]; then
+    capitalize_all
+  fi
+  
+if [ $i -eq $NUMBER_OF_WORDS ]; then
+  RANDOM_PASS="${RANDOM_PASS}${RANDOM_WORD}"
+else
   RANDOM_PASS="${RANDOM_PASS}${RANDOM_WORD}${RANDOM_CHAR}"
+fi
 done
 generate_padding
 RANDOM_PASS=${PADDING_BEFORE}${RANDOM_PASS}${PADDING_AFTER}
@@ -173,3 +208,10 @@ echo -n "$RANDOM_PASS" | xclip -selection "clipboard"
 if [ "$DISPLAY_PASSWORD" = true ]; then
   echo $RANDOM_PASS
 fi
+
+RANDOM_PASS="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+WORDLIST="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+CHARLIST="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+RANDOM_WORD="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+RANDOM_CHAR="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+RANDOM_NUM="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"

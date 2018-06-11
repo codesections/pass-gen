@@ -30,7 +30,11 @@ sudo ./install.sh
 If you ever need to uninstall, run the following command from the pass-gen directory:
 
 ```
+<<<<<<< HEAD
 sudo ./unistall.sh
+=======
+sudo make uninstall
+>>>>>>> dev
 ```
 
 ## Usage
@@ -99,5 +103,9 @@ Planned future features:
 * Support for using multiple wordlist files in the same passphrase
 * Additional built-in wordlist files (especially non-English files)
 * Additional error handling
+<<<<<<< HEAD
 * Optionally providing a Makefile in addition to an install.sh script
+=======
+* Optionally providing a Makefile in addition to an install.sh script (**Done**, v0.0.2)
+>>>>>>> dev
 
