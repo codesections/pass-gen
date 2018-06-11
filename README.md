@@ -22,7 +22,7 @@ To install pass-gen, run the following command in your terminal:
 ```
 git clone https://gitlab.com/codesections/pass-gen.git && \
 cd pass-gen && \
-sudo ./install.sh
+sudo make install
 ```
 
 
@@ -30,11 +30,7 @@ sudo ./install.sh
 If you ever need to uninstall, run the following command from the pass-gen directory:
 
 ```
-<<<<<<< HEAD
-sudo ./unistall.sh
-=======
 sudo make uninstall
->>>>>>> dev
 ```
 
 ## Usage
