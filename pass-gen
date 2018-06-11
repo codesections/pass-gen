@@ -7,7 +7,7 @@
 
 #  Default settings (unless overridden by command-line options or .passgenrc)
 WORDLIST=/usr/local/lib/pass-gen/wordlists/EFF_wordlist_total
-CHARLIST=/usr/local/lib/pass-gen/character-lists/conservative_character_list
+CHARLIST=/usr/local/lib/pass-gen/character-lists/default_character_list
 PADDING_LENGTH_BEFORE=0
 PADDING_LENGTH_AFTER=3
 NUMBER_OF_WORDS=6
@@ -190,7 +190,11 @@ for i in $(seq 1 $NUMBER_OF_WORDS); do
     capitalize_all
   fi
   
+if [ $i -eq $NUMBER_OF_WORDS ]; then
+  RANDOM_PASS="${RANDOM_PASS}${RANDOM_WORD}"
+else
   RANDOM_PASS="${RANDOM_PASS}${RANDOM_WORD}${RANDOM_CHAR}"
+fi
 done
 generate_padding
 RANDOM_PASS=${PADDING_BEFORE}${RANDOM_PASS}${PADDING_AFTER}
