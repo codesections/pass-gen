@@ -22,7 +22,7 @@ To install pass-gen, run the following command in your terminal:
 ```
 git clone git@gitlab.com:codesections/pass-gen.git &&\
 cd pass-gen && \
-sudo ./install.sh
+sudo make install
 ```
 
 
@@ -30,7 +30,7 @@ sudo ./install.sh
 If you ever need to uninstall, run the following command from the pass-gen directory:
 
 ```
-sudo ./unistall.sh
+sudo make uninstall
 ```
 
 ## Usage
@@ -99,5 +99,5 @@ Planned future features:
 * Support for using multiple wordlist files in the same passphrase
 * Additional built-in wordlist files (especially non-English files)
 * Additional error handling
-* Optionally providing a Makefile in addition to an install.sh script
+* Optionally providing a Makefile in addition to an install.sh script (**Done**, v0.0.2)
 
