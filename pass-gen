@@ -54,11 +54,20 @@ Full documentation avalible in the pass-gen(1) man page.
 }
 
 cmd_error() {
-    cat <<-_EOF
+    >&2 cat <<-_EOF
   pass-gen: unrecognized option '$1'
   Try 'pass-gen --help' for more information.
 	_EOF
     exit 1
+}
+
+cmd_echo() {
+  DISPLAY_PASSWORD=true 
+  case $1 in
+  # TODO: Fix this to treat 1 as the default value and not shift past next arg
+    ''|*[!0-9]*)             >&2 echo "Please supply a number"; exit 1;;
+    *)                       NUMBER_TO_DISPLAY=$1; echo "$1";;
+  esac
 }
 
 
@@ -110,7 +119,7 @@ if [[ "$1" ]]; then
       --padding-before) shift;               PADDING_LENGTH_BEFORE=$1; shift ;;
       --padding-after) shift;                PADDING_LENGTH_AFTER=$1; shift ;;
       --capital-mode) shift;                 CAPITALIZATION_MODE=$1; shift ;;
-      -e | --echo-password) shift;           DISPLAY_PASSWORD=true ;;
+      -e | --echo-password) shift;           cmd_echo "$@"; shift;;
       -v | -V | --version) shift;            cmd_version ;;
       -h | --help) shift;                    cmd_help ;;
       *)                                     cmd_error "$@" ;;
@@ -179,34 +188,46 @@ generate_padding() {
 }
 
 #  Generate passphrase by combining random words with the chosen character
-generate_random_symbol
-for i in $(seq 1 $NUMBER_OF_WORDS); do
-  generate_random_word
-  if [ "$CAPITALIZATION_MODE" = "both" ]; then
-    capitalize_both
-  elif [ "$CAPITALIZATION_MODE" = "initial" ]; then
-    capitalize_initial
-  elif [ "$CAPITALIZATION_MODE" = "all" ]; then
-    capitalize_all
+generate_passphrase() {
+  generate_random_symbol
+  for i in $(seq 1 $NUMBER_OF_WORDS); do
+    generate_random_word
+    if [ "$CAPITALIZATION_MODE" = "both" ]; then
+      capitalize_both
+    elif [ "$CAPITALIZATION_MODE" = "initial" ]; then
+      capitalize_initial
+    elif [ "$CAPITALIZATION_MODE" = "all" ]; then
+      capitalize_all
+    fi
+    
+  if [ $i -eq $NUMBER_OF_WORDS ]; then
+    RANDOM_PASS="${RANDOM_PASS}${RANDOM_WORD}"
+  else
+    RANDOM_PASS="${RANDOM_PASS}${RANDOM_WORD}${RANDOM_CHAR}"
   fi
-  
-if [ $i -eq $NUMBER_OF_WORDS ]; then
-  RANDOM_PASS="${RANDOM_PASS}${RANDOM_WORD}"
-else
-  RANDOM_PASS="${RANDOM_PASS}${RANDOM_WORD}${RANDOM_CHAR}"
-fi
-done
-generate_padding
-RANDOM_PASS=${PADDING_BEFORE}${RANDOM_PASS}${PADDING_AFTER}
+  done
+  generate_padding
+  RANDOM_PASS=${PADDING_BEFORE}${RANDOM_PASS}${PADDING_AFTER}
+}
 
+clear_passphrase() {
+  RANDOM_PASS=""
+  PADDING_BEFORE=""
+  PADDING_AFTER=""
+}
 
+generate_passphrase
 echo -n "$RANDOM_PASS" | xclip -selection "clipboard"
 >&2 echo "Generated passphrase copied to clipboard.  Will clear in 45 seconds."
-
+clear_passphrase
 ( sleep 45 ; echo -n "" | xclip -selection "clipboard" ) &
 
 if [ "$DISPLAY_PASSWORD" = true ]; then
-  echo $RANDOM_PASS
+  for i in $(seq 0 $NUMBER_TO_DISPLAY); do
+    echo $RANDOM_PASS
+    clear_passphrase
+    generate_passphrase
+  done
 fi
 
 RANDOM_PASS="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
