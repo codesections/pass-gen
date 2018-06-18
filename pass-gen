@@ -42,7 +42,7 @@ Options:
   --padding-before <NUMBER>        preceed passphrase with NUMBER random numbers
   --padding-after <NUMBER>         follow passphrase with NUMBER random numbers
   --capital-mode all|initial|both  set the capitalization mode for words
-  -e, --echo-password              display the passphrase in the terminal
+  -e [N], --echo-password [N]      displays N passphrases, or one if N not set
   --word-list <PATH>               use wordlist found at PATH
   --special-character-list <PATH>  use special character list found at PATH
   -v, -V, --version                display version information and exit
