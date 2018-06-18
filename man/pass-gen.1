@@ -44,11 +44,11 @@ Insert \fInumber\fP numbers before the words that comprise the passphrase.  Defa
 \fB--padding-after\fP \fInumber\fP
 Insert \fInumber\fP numbers after the words that comprise the passphrase.  Default value: 3.
 .TP
-\fB--capital-mode\fIall|initial|both
+\fB--capital-mode\fI all\fP|\fIinitial\fP|\fIboth\fP
 Set the capitalization mode.  If set to `all`, every other word will be in all capitals (LIKE THIS).  If set to `initial`, every other word will have its first letter capitalized (Like This).  If set to `both`, every third word will be all capitals, and every third word will have an initial capital.  For example, a three-word password without padding might be `bazooka@Backyard@PREVIOUS@`.  Under any setting, the capitalization status of the first word will be chosen randomly, and the capitalization status of the other words will alternate.  Default value: both.
 .TP
-\fB-e | --echo-password\fP
-Echos the generated password to standard output (thus typically displaying it to the command line) in addition to copying it to the clipboard.  By default, the password is not displayed, just copied, which prevents it from being inadvertently seen by others.
+\fB-e\fP [\fInumber\fP] | \fB--echo-password\fP [\fIn\fP]\fP
+Echos the generated password to standard output (thus typically displaying it to the command line) in addition to copying it to the clipboard.  If \fInumber\fP is provided, generates and echos \fInumber\fP of passwords.  By default, the password is not displayed, just copied, which prevents it from being inadvertently seen by others.
 .TP
 \fB--word-list\fP \fIpath/to/wordlist/file\fP
 Uses a wordlist file found at \fIpath/to/wordlist/file\fP.  A wordlist is a simple file of words, one per line.  The passphrase will be constructed by randomly selecting words from the wordlist file.  Multiple wordlist files are included in pass-gen/wordlists; see the \fBwordlists & character lists\fP section, below, for details about the size and providence of the built-in wordlists.  Alternately, you may use your own wordlist, so long as it consists of one word per line.  Default value: pass-gen/wordlist/EEF_wordlist_total.
