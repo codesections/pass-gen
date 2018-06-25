@@ -7,13 +7,17 @@
 
 #  Default settings (unless overridden by command-line options or .passgenrc)
 WORDLIST=/usr/local/lib/pass-gen/wordlists/EFF_wordlist_total
+SIZE_OF_WORDLIST="not set"
 CHARLIST=/usr/local/lib/pass-gen/character-lists/default_character_list
+SIZE_OF_CHARLIST="not set"
 PADDING_LENGTH_BEFORE=0
 PADDING_LENGTH_AFTER=3
 NUMBER_OF_WORDS=6
 CAPITAL_COUNTER="$(( $(od -An -N2 -i /dev/urandom) % (2) ))" #randomly 1 or 2
 CAPITALIZATION_MODE="both"
+CAPITALIZATION_OPTIONS_PER_WORD=3
 DISPLAY_PASSWORD=false
+REPORT_ENTROPY=false
 
 
 #  If a configuration file exists, read values from it
@@ -50,6 +54,11 @@ if [ -f /home/$USER/.passgenrc ]; then
   if [ $(grep echo-password $CONFIG_FILE) ]; then
     DISPLAY_PASSWORD=true
   fi
+
+  if [ $(grep report-entropy $CONFIG_FILE) ]; then
+    REPORT_ENTROPY=true
+  fi
+
 fi
 
 
@@ -58,7 +67,7 @@ fi
 ##
 
 cmd_version() {
-  cat <<-_EOF
+  >&2 cat <<-_EOF
 pass-gen v.0.0.1
 Copyright (C) 2018 Daniel Long Sockwell, www.codesections.com
 License GPLv3+: GNU GPL version 3, https://gnu.org/licenses/gpl.html.
@@ -72,7 +81,7 @@ Written by Daniel Long Sockwell
 
 
 cmd_help() {
-  cat <<-_EOF
+  >&2 cat <<-_EOF
 Usage: pass-gen [OPTION]
 
 Generates a secure, random passphrase based on the options supplied.
@@ -176,16 +185,21 @@ cmd_capital_mode() {
 	_EOF
    exit 1;;
    esac
+   if [[ CAPITALIZATION_MODE!=both ]]; then
+     CAPITALIZATION_OPTIONS_PER_WORD=2
+   fi
 }
 
-
+cmd_report_entrophy() { 
+  REPORT_ENTROPY=true
+}
 
 #  Pick a random symbol from CHARLIST
 generate_random_symbol() {
   MIN=1
-  MAX=$(cat $CHARLIST | wc -l)
+  SIZE_OF_CHARLIST=$(cat $CHARLIST | wc -l)
   #  Generate a random number between MAX and MIN
-  RANDOM_NUM="$(( $MIN + $(od -An -N2 -i /dev/urandom) % ($MAX - $MIN + 1) ))"
+  RANDOM_NUM="$(( $MIN + $(od -An -N2 -i /dev/urandom) % ($SIZE_OF_CHARLIST - $MIN + 1) ))"
   RANDOM_CHAR="$(sed -n ${RANDOM_NUM}p $CHARLIST)"
 }
 
@@ -193,9 +207,9 @@ generate_random_symbol() {
 #  Generate a random word from WORDLIST
 generate_random_word() {
   MIN=1
-  MAX=$(cat $WORDLIST | wc -l)
+  SIZE_OF_WORDLIST=$(cat $WORDLIST | wc -l)
   #  Generate a random number between MAX and MIN
-  RANDOM_NUM="$(( $MIN + $(od -An -N2 -i /dev/urandom) % ($MAX - $MIN + 1) ))"
+  RANDOM_NUM="$(( $MIN + $(od -An -N2 -i /dev/urandom) % ($SIZE_OF_CHARLIST - $MIN + 1) ))"
 
   RANDOM_WORD="$(sed -n ${RANDOM_NUM}p $WORDLIST)"
 }
@@ -285,6 +299,7 @@ if [[ "$1" ]]; then
                                                shift
                                              fi ;;
       -v | -V | --version) shift;            cmd_version ;;
+      -r | --report-entropy) shift;          cmd_report_entrophy;;
       -h | --help) shift;                    cmd_help ;;
       *)                                     cmd_error "$@" ;;
     esac
@@ -302,6 +317,32 @@ if [ "$DISPLAY_PASSWORD" = true ]; then
     clear_passphrase
     generate_passphrase
   done
+fi
+
+if [[ "$REPORT_ENTROPY" = true ]]; then
+  bold=$(tput bold)
+  normal=$(tput sgr0)
+
+  TOTAL_SEARCH_SPACE=`echo "($(($SIZE_OF_WORDLIST*$CAPITALIZATION_OPTIONS_PER_WORD))^$NUMBER_OF_WORDS) * $SIZE_OF_CHARLIST * $((10**$PADDING_LENGTH_BEFORE)) * $((10**$PADDING_LENGTH_AFTER))" | bc -l`
+  ENTROPY=`echo "scale=2; l($TOTAL_SEARCH_SPACE)/l(2)" | bc -l`
+  >&2 cat <<-_EOF
+  
+${bold}Password Statistics:$normal
+Number of words on wordlist:		$SIZE_OF_WORDLIST
+Capitalization options per word:	$CAPITALIZATION_OPTIONS_PER_WORD
+Effective size of wordlist:		$(($SIZE_OF_WORDLIST * $CAPITALIZATION_OPTIONS_PER_WORD))
+Number of random words used:		$NUMBER_OF_WORDS
+Symbols on the character list:		$SIZE_OF_CHARLIST
+Possibilities for padding before:	$((10**$PADDING_LENGTH_BEFORE))
+Possibilities for padding after:	$((10**$PADDING_LENGTH_AFTER))
+Formula for search space:	$(($SIZE_OF_WORDLIST*$CAPITALIZATION_OPTIONS_PER_WORD))^$NUMBER_OF_WORDS * $SIZE_OF_CHARLIST * $((10**$PADDING_LENGTH_BEFORE)) * $((10**$PADDING_LENGTH_AFTER))
+========================================================
+Search space:		$TOTAL_SEARCH_SPACE
+Total entropy of passphrase:${bold}	 	$ENTROPY bits${normal}
+  
+For comparison purposes, know that passwords generated
+by the EFF Dice password tool contain 77 bits of entropy
+	_EOF
 fi
 
 RANDOM_PASS="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
