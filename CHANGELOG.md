@@ -13,3 +13,5 @@ Add ability to generate and display multiple passphrases in one command
 ## 0.3.1 (2018-06-22)
 Improve error handling for invalid inputs to command-line options
 
+## 0.4.0 (2018-06-24)
+Add ability to generate a report showing the entropy of the password and related statistics
