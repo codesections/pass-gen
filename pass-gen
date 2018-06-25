@@ -210,7 +210,7 @@ generate_random_word() {
   MIN=1
   SIZE_OF_WORDLIST=$(cat $WORDLIST | wc -l)
   #  Generate a random number between MAX and MIN
-  RANDOM_NUM="$(( $MIN + $(od -An -N2 -i /dev/urandom) % ($SIZE_OF_CHARLIST - $MIN + 1) ))"
+  RANDOM_NUM="$(( $MIN + $(od -An -N2 -i /dev/urandom) % ($SIZE_OF_WORDLIST - $MIN + 1) ))"
 
   RANDOM_WORD="$(sed -n ${RANDOM_NUM}p $WORDLIST)"
 }
