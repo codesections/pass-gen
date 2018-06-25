@@ -56,6 +56,9 @@ Uses a wordlist file found at \fIpath/to/wordlist/file\fP.  A wordlist is a simp
 \fB--special-character-list \fIpath/to/special-character/file\fP
 Uses a character list file found at \fIpath/to/character-list/file\fP.  A character list is a simple file of characters, one per line.  When constructing a passphrase, \fBpass-gen\fP will append a random character after each word to separate the words and render them compound safe.  (The same character is used throughout the passphrase.)  Multiple character list files are included in pass-gen/character-lists; see the \fBwordlists & character lists\fP section, below, for details about the size and providence of the built-in lists.  Alternately, you may use your own list, so long as it consists of one character per line.  Default value: pass-gen/character-lists/default_character_list
 .TP
+\fB-r | --report-entropy\fP
+Generates a report listing statistics about the inputs to the generated password as well as the final search space and total entropy of the password.  The search space is the total number of passwords an attacker would need to generate to brute-force the password. \fBNote\fP: The search space and entropy numbers are calculated with the pessimistic assumption that the attacker has full knowledge of the method of password generation, including the full configuration and the dictionary file used.  In the far more likely scenario that the attacker lacks this information, the password would be much more secure.  Thus, the generated numbers represent a worst-case scenario.
+.TP
 \fB-v | -V | --version\fP
 Display version information and exit.
 .TP

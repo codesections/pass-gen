@@ -68,7 +68,7 @@ fi
 
 cmd_version() {
   >&2 cat <<-_EOF
-pass-gen v.0.0.1
+pass-gen v.0.4.0
 Copyright (C) 2018 Daniel Long Sockwell, www.codesections.com
 License GPLv3+: GNU GPL version 3, https://gnu.org/licenses/gpl.html.
 This is free software: you are free to change and redistribute it.
@@ -95,6 +95,7 @@ Options:
   -e [N], --echo-password [N]      displays N passphrases, or one if N not set
   --word-list <PATH>               use wordlist found at PATH
   --special-character-list <PATH>  use special character list found at PATH
+  -r, --report-entropy             report the search space for generated password
   -v, -V, --version                display version information and exit
   -h, --help                       display this help message and exit
 
