@@ -68,7 +68,7 @@ fi
 
 cmd_version() {
   >&2 cat <<-_EOF
-pass-gen v.0.4.0
+pass-gen v.0.5.0
 Copyright (C) 2018 Daniel Long Sockwell, www.codesections.com
 License GPLv3+: GNU GPL version 3, https://gnu.org/licenses/gpl.html.
 This is free software: you are free to change and redistribute it.

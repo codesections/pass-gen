@@ -18,3 +18,6 @@ Add ability to generate a report showing the entropy of the password and related
 
 ## 0.4.1 (2018-07-05)
 Fix issue where password copied to clipboard would differ from password displayed with `-e` flag
+
+## 0.5.0 (2018-07-05)
+Add Zsh command completion
