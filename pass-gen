@@ -315,6 +315,7 @@ clear_passphrase
 if [ "$DISPLAY_PASSWORD" = true ]; then
   for i in $(seq 0 $NUMBER_TO_DISPLAY); do
     echo $RANDOM_PASS
+    echo -n "$RANDOM_PASS" | xclip -selection "clipboard"
     clear_passphrase
     generate_passphrase
   done
