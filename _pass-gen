@@ -1,0 +1,53 @@
+#compdef pass-gen
+
+autoload -U is-at-least
+
+_pass-gen() {
+    typeset -A opt_args
+    typeset -a _arguments_options
+    local ret=1
+
+    local context curcontext="$curcontext" state line
+    _arguments "${_arguments_options[@]}" \
+":: :_pass-gen_commands" \
+"*::: :->pass-gen" \
+&& ret=0
+    case $state in
+    (pass-gen)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:pass-gen-command-$line[1]:"
+        case $line[1] in
+            (init)
+_arguments "${_arguments_options[@]}" \
+'' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+}
+
+(( $+functions[_pass-gen_commands] )) ||
+_pass-gen_commands() {
+    local commands; commands=(
+        "--length:use NUMBER words to generate the passphrase" \
+"-l:use NUMBER words to generate the passphrase" \
+"--padding-before:preceed passphrase with NUMBER random numbers" \
+"--padding-after:follow passphrase with NUMBER random numbers" \
+"--capital-mode:set the capitalization mode to \`all\` \`initial\` or \`both\`" \
+"--echo-password:displays N passphrases, or one if N not provided" \
+"-e:displays N passphrases, or one if N not provided" \
+"--word-list:use wordlist at specified PATH" \
+"--special-character-list:use special character list found at PATH" \
+"--report-entrophy:report the search space for generate password" \
+"-r:report the search space for generate password" \
+"--version: display version information and exit" \
+"-v: display version information and exit" \
+"-V: display version information and exit" \
+"--help:display help message and exit" \
+"-h:display help message and exit" 
+    )
+    _describe -t commands 'pass-gen commands' commands "$@"
+}
+_pass-gen "$@"
