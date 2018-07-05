@@ -1,0 +1,100 @@
+#compdef pass-gen
+
+autoload -U is-at-least
+
+_gutenberg() {
+    typeset -A opt_args
+    typeset -a _arguments_options
+    local ret=1
+
+    local context curcontext="$curcontext" state line
+    _arguments "${_arguments_options[@]}" \
+'-c+[Path to a config file other than config.toml]' \
+'--config=[Path to a config file other than config.toml]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+":: :_gutenberg_commands" \
+"*::: :->gutenberg" \
+&& ret=0
+    case $state in
+    (gutenberg)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:gutenberg-command-$line[1]:"
+        case $line[1] in
+            (init)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+':name -- Name of the project. Will create a new directory with that name in the current directory:_files' \
+&& ret=0
+;;
+(build)
+_arguments "${_arguments_options[@]}" \
+'-u+[Force the base URL to be that value (default to the one in config.toml)]' \
+'--base-url=[Force the base URL to be that value (default to the one in config.toml)]' \
+'-o+[Outputs the generated site in the given path]' \
+'--output-dir=[Outputs the generated site in the given path]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+(serve)
+_arguments "${_arguments_options[@]}" \
+'-i+[Interface to bind on]' \
+'--interface=[Interface to bind on]' \
+'-p+[Which port to use]' \
+'--port=[Which port to use]' \
+'-o+[Outputs the generated site in the given path]' \
+'--output-dir=[Outputs the generated site in the given path]' \
+'-u+[Changes the base_url]' \
+'--base-url=[Changes the base_url]' \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+}
+
+(( $+functions[_gutenberg_commands] )) ||
+_gutenberg_commands() {
+    local commands; commands=(
+        "init:Create a new project" \
+"--length:use NUMBER words to generate the passphrase" \
+"-l:use NUMBER words to generate the passphrase" \
+"--padding-before:preceed passphrase with NUMBER random numbers" \
+"--padding-after:follow passphrase with NUMBER random numbers" \
+"--capital-mode:set the capitalization mode to \`all\` \`initial\` or \`both\`" \
+"--echo-password:displays N passphrases, or one if N not provided" \
+"-e:displays N passphrases, or one if N not provided" \
+"--word-list:use wordlist at specified PATH" \
+"--special-character-list:use special character list found at PATH" \
+"--report-entrophy:report the search space for generate password" \
+"-r:report the search space for generate password" \
+"--version: display version information and exit" \
+"-v: display version information and exit" \
+"-V: display version information and exit" \
+"--help:display help message and exit" \
+"-h:display help message and exit" 
+    )
+    _describe -t commands 'gutenberg commands' commands "$@"
+}
+_gutenberg "$@"
