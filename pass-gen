@@ -313,11 +313,11 @@ clear_passphrase
 ( sleep 45 ; echo -n "" | xclip -selection "clipboard" ) &
 
 if [ "$DISPLAY_PASSWORD" = true ]; then
-  for i in $(seq 0 $NUMBER_TO_DISPLAY); do
-    echo $RANDOM_PASS
-    echo -n "$RANDOM_PASS" | xclip -selection "clipboard"
+  for i in $(seq 1 $NUMBER_TO_DISPLAY); do
     clear_passphrase
     generate_passphrase
+    echo $RANDOM_PASS
+    echo -n "$RANDOM_PASS" | xclip -selection "clipboard"
   done
 fi
 
