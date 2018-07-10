@@ -21,3 +21,6 @@ Fix issue where password copied to clipboard would differ from password displaye
 
 ## 0.5.0 (2018-07-05)
 Add Zsh command completion
+
+## 0.5.1 (2018-07-09)
+Fix bug causing issue with `pass` integration
