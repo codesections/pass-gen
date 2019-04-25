@@ -344,11 +344,6 @@ if [[ "$1" ]]; then
     esac
   done
 fi
-generate_passphrase
-echo -n "$RANDOM_PASS" | xclip -selection "clipboard"
->&2 echo "Generated passphrase copied to clipboard.  Will clear in 45 seconds."
-clear_passphrase
-( sleep 45 ; echo -n "" | xclip -selection "clipboard" ) &
 
 if [ "$DISPLAY_PASSWORD" = true ]; then
   for i in $(seq 1 $NUMBER_TO_DISPLAY); do
@@ -357,6 +352,14 @@ if [ "$DISPLAY_PASSWORD" = true ]; then
     echo $RANDOM_PASS
     echo -n "$RANDOM_PASS" | xclip -selection "clipboard"
   done
+  clear_passphrase
+  ( sleep 45 ; echo -n "" | xclip -selection "clipboard" ) &
+else
+  generate_passphrase
+  echo -n "$RANDOM_PASS" | xclip -selection "clipboard"
+  >&2 echo "Generated passphrase copied to clipboard.  Will clear in 45 seconds."
+  clear_passphrase
+  ( sleep 45 ; echo -n "" | xclip -selection "clipboard" ) &
 fi
 
 if [[ "$REPORT_ENTROPY" = true ]]; then
